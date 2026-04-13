@@ -1,0 +1,218 @@
+{
+  "students": [
+    {
+      "id": "21BCS045",
+      "name": "Priya Sharma",
+      "email": "priya@aceec.ac.in",
+      "password": "priya123",
+      "branch": "CSE",
+      "year": "3rd Year",
+      "wallet": 265,
+      "hostel": "Block A, Room 204"
+    },
+    {
+      "id": "21BCS046",
+      "name": "Rahul Verma",
+      "email": "rahul@aceec.ac.in",
+      "password": "rahul123",
+      "branch": "ECE",
+      "year": "2nd Year",
+      "wallet": 370,
+      "hostel": "Block B, Room 112"
+    },
+    {
+      "id": "21BCS047",
+      "name": "Sneha Reddy",
+      "email": "sneha@aceec.ac.in",
+      "password": "sneha123",
+      "branch": "CSE",
+      "year": "3rd Year",
+      "wallet": 150,
+      "hostel": "Block C, Room 305"
+    },
+    {
+      "id": "21BCS048",
+      "name": "Arjun Nair",
+      "email": "arjun@aceec.ac.in",
+      "password": "arjun123",
+      "branch": "MECH",
+      "year": "4th Year",
+      "wallet": 600,
+      "hostel": "Block A, Room 410"
+    },
+    {
+      "id": "21BCS049",
+      "name": "Divya Patel",
+      "email": "divya@aceec.ac.in",
+      "password": "divya123",
+      "branch": "IT",
+      "year": "1st Year",
+      "wallet": 200,
+      "hostel": "Block D, Room 101"
+    }
+  ],
+  "admin": {
+    "username": "admin",
+    "password": "admin123",
+    "totalRevenue": 215
+  },
+  "items": [
+    {
+      "id": "1",
+      "name": "Masala Dosa",
+      "price": 40,
+      "category": "Breakfast",
+      "emoji": "🫓",
+      "stock": 8,
+      "prepTime": 5
+    },
+    {
+      "id": "2",
+      "name": "Veg Biryani",
+      "price": 80,
+      "category": "Lunch",
+      "emoji": "🍛",
+      "stock": 4,
+      "prepTime": 10
+    },
+    {
+      "id": "3",
+      "name": "Paneer Wrap",
+      "price": 60,
+      "category": "Snacks",
+      "emoji": "🌯",
+      "stock": 6,
+      "prepTime": 7
+    },
+    {
+      "id": "4",
+      "name": "Cold Coffee",
+      "price": 35,
+      "category": "Drinks",
+      "emoji": "☕",
+      "stock": 5,
+      "prepTime": 3
+    },
+    {
+      "id": "5",
+      "name": "Samosa Plate",
+      "price": 25,
+      "category": "Snacks",
+      "emoji": "🥟",
+      "stock": 4,
+      "prepTime": 4
+    },
+    {
+      "id": "6",
+      "name": "Chicken Burger",
+      "price": 90,
+      "category": "Lunch",
+      "emoji": "🍔",
+      "stock": 3,
+      "prepTime": 8
+    },
+    {
+      "id": "7",
+      "name": "Fresh Lime Soda",
+      "price": 20,
+      "category": "Drinks",
+      "emoji": "🍋",
+      "stock": 20,
+      "prepTime": 2
+    },
+    {
+      "id": "8",
+      "name": "Upma",
+      "price": 30,
+      "category": "Breakfast",
+      "emoji": "🍚",
+      "stock": 5,
+      "prepTime": 5
+    },
+    {
+      "id": "9",
+      "name": "Veg Noodles",
+      "price": 55,
+      "category": "Lunch",
+      "emoji": "🍜",
+      "stock": 5,
+      "prepTime": 9
+    },
+    {
+      "id": "10",
+      "name": "Choco Shake",
+      "price": 45,
+      "category": "Drinks",
+      "emoji": "🍫",
+      "stock": 6,
+      "prepTime": 3
+    }
+  ],
+  "orders": [
+    {
+      "_id": "1776011764361",
+      "token": 103,
+      "studentName": "Priya Sharma",
+      "studentId": "21BCS045",
+      "items": [
+        {
+          "itemId": "6",
+          "name": "Chicken Burger",
+          "price": 90,
+          "emoji": "🍔",
+          "quantity": 1
+        }
+      ],
+      "total": 90,
+      "paymentMethod": "wallet",
+      "status": "completed",
+      "createdAt": "2026-04-12T16:36:04.361Z",
+      "readyAt": "2026-04-12T16:36:44.963Z",
+      "uncollectedAt": null
+    },
+    {
+      "_id": "1775997463600",
+      "token": 102,
+      "studentName": "Priya Sharma",
+      "studentId": "21BCS045",
+      "items": [
+        {
+          "itemId": "10",
+          "name": "Choco Shake",
+          "price": 45,
+          "emoji": "🍫",
+          "quantity": 1
+        }
+      ],
+      "total": 45,
+      "paymentMethod": "wallet",
+      "status": "completed",
+      "createdAt": "2026-04-12T12:37:43.600Z",
+      "readyAt": "2026-04-12T12:43:29.652Z",
+      "uncollectedAt": null
+    },
+    {
+      "_id": "1775983420846",
+      "token": 101,
+      "studentName": "Priya Sharma",
+      "studentId": "21BCS045",
+      "items": [
+        {
+          "itemId": "2",
+          "name": "Veg Biryani",
+          "price": 80,
+          "emoji": "🍛",
+          "quantity": 1
+        }
+      ],
+      "total": 80,
+      "paymentMethod": "wallet",
+      "status": "completed",
+      "createdAt": "2026-04-12T08:43:40.846Z",
+      "readyAt": "2026-04-12T08:44:30.909Z",
+      "uncollectedAt": null
+    }
+  ],
+  "complaints": [],
+  "tokenCounter": 103
+}
