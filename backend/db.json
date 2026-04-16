@@ -17,7 +17,7 @@
       "password": "rahul123",
       "branch": "ECE",
       "year": "2nd Year",
-      "wallet": 370,
+      "wallet": 280,
       "hostel": "Block B, Room 112"
     },
     {
@@ -37,7 +37,7 @@
       "password": "arjun123",
       "branch": "MECH",
       "year": "4th Year",
-      "wallet": 600,
+      "wallet": 520,
       "hostel": "Block A, Room 410"
     },
     {
@@ -54,7 +54,7 @@
   "admin": {
     "username": "admin",
     "password": "admin123",
-    "totalRevenue": 215
+    "totalRevenue": 385
   },
   "items": [
     {
@@ -72,7 +72,7 @@
       "price": 80,
       "category": "Lunch",
       "emoji": "🍛",
-      "stock": 4,
+      "stock": 5,
       "prepTime": 10
     },
     {
@@ -81,7 +81,7 @@
       "price": 60,
       "category": "Snacks",
       "emoji": "🌯",
-      "stock": 6,
+      "stock": 5,
       "prepTime": 7
     },
     {
@@ -108,7 +108,7 @@
       "price": 90,
       "category": "Lunch",
       "emoji": "🍔",
-      "stock": 3,
+      "stock": 2,
       "prepTime": 8
     },
     {
@@ -117,7 +117,7 @@
       "price": 20,
       "category": "Drinks",
       "emoji": "🍋",
-      "stock": 20,
+      "stock": 19,
       "prepTime": 2
     },
     {
@@ -149,6 +149,55 @@
     }
   ],
   "orders": [
+    {
+      "_id": "1776331606747",
+      "token": 105,
+      "studentName": "Arjun Nair",
+      "studentId": "21BCS048",
+      "items": [
+        {
+          "itemId": "7",
+          "name": "Fresh Lime Soda",
+          "price": 20,
+          "emoji": "🍋",
+          "quantity": 1
+        },
+        {
+          "itemId": "3",
+          "name": "Paneer Wrap",
+          "price": 60,
+          "emoji": "🌯",
+          "quantity": 1
+        }
+      ],
+      "total": 80,
+      "paymentMethod": "wallet",
+      "status": "pending",
+      "createdAt": "2026-04-16T09:26:46.747Z",
+      "readyAt": null,
+      "uncollectedAt": null
+    },
+    {
+      "_id": "1776317010694",
+      "token": 104,
+      "studentName": "Rahul Verma",
+      "studentId": "21BCS046",
+      "items": [
+        {
+          "itemId": "6",
+          "name": "Chicken Burger",
+          "price": 90,
+          "emoji": "🍔",
+          "quantity": 1
+        }
+      ],
+      "total": 90,
+      "paymentMethod": "wallet",
+      "status": "completed",
+      "createdAt": "2026-04-16T05:23:30.694Z",
+      "readyAt": "2026-04-16T05:24:02.628Z",
+      "uncollectedAt": null
+    },
     {
       "_id": "1776011764361",
       "token": 103,
@@ -214,5 +263,5 @@
     }
   ],
   "complaints": [],
-  "tokenCounter": 103
+  "tokenCounter": 105
 }
