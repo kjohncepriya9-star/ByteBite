@@ -1,4 +1,3 @@
-// server.js — ByteBite Backend (Corrected & Stable)
 
 const express = require('express');
 const http = require('http');
@@ -11,9 +10,10 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ Better CORS (important for Vercel frontend)
+// ✅ FRONTEND URL (for Vercel)
 const FRONTEND_URL = process.env.FRONTEND_URL || "*";
 
+// ✅ Socket.IO with CORS
 const io = new Server(server, {
   cors: {
     origin: FRONTEND_URL,
@@ -22,6 +22,7 @@ const io = new Server(server, {
   }
 });
 
+// ✅ Express CORS
 app.use(cors({
   origin: FRONTEND_URL,
   credentials: true
@@ -31,7 +32,7 @@ app.use(express.json());
 
 const DB_PATH = path.join(__dirname, 'db.json');
 
-// 📁 DB Helpers (SAFE VERSION)
+// 📁 DB Helpers
 function readDB() {
   try {
     return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
@@ -58,7 +59,7 @@ function calcHeat(n) {
   return { level: 'red', label: 'High Crowd' };
 }
 
-// ⏱ Auto mark uncollected (FIXED COUNT BUG)
+// ⏱ Auto mark uncollected
 setInterval(() => {
   const db = readDB();
   const now = Date.now();
@@ -71,7 +72,7 @@ setInterval(() => {
       if (now - readyTime > 30 * 60 * 1000) {
         o.status = 'uncollected';
         o.uncollectedAt = new Date().toISOString();
-        activeTokenCount = Math.max(0, activeTokenCount - 1); // ✅ FIX
+        activeTokenCount = Math.max(0, activeTokenCount - 1);
         changed = true;
       }
     }
@@ -119,7 +120,7 @@ app.post('/api/auth/login', (req, res) => {
 app.get('/api/menu', (req, res) => res.json(readDB().items));
 
 // ORDERS
-app.get('/api/orders', (req, res) => res.json(readDB().orders));
+app.get('/api/orders', (req, res) => res.json(readDB().orders);
 
 app.get('/api/orders/student/:studentId', (req, res) => {
   const db = readDB();
@@ -163,7 +164,7 @@ app.patch('/api/students/:id/wallet', (req, res) => {
   student.wallet += Number(req.body.amount);
   writeDB(db);
 
-  io.emit('wallet:update', { wallet: student.wallet }); // ✅ important
+  io.emit('wallet:update', { wallet: student.wallet });
 
   res.json({ wallet: student.wallet });
 });
@@ -205,7 +206,7 @@ io.on('connection', (socket) => {
     ...calcHeat(activeTokenCount)
   });
 
-  // 🧾 PLACE ORDER
+  // PLACE ORDER
   socket.on('student:placeOrder', (orderData) => {
     const db = readDB();
     const { studentName, studentId, items, total, paymentMethod } = orderData;
@@ -230,7 +231,7 @@ io.on('connection', (socket) => {
 
     items.forEach(({ itemId, quantity }) => {
       const item = db.items.find(i => i.id === String(itemId));
-      if (item) item.stock = Math.max(0, item.stock - quantity); // ✅ safe
+      if (item) item.stock = Math.max(0, item.stock - quantity);
     });
 
     const newOrder = {
@@ -260,7 +261,7 @@ io.on('connection', (socket) => {
     socket.emit('order:confirmed', newOrder);
   });
 
-  // 🔄 UPDATE STATUS
+  // UPDATE STATUS
   socket.on('admin:updateStatus', ({ orderId, status }) => {
     const db = readDB();
     const order = db.orders.find(o => o._id === orderId);
@@ -271,7 +272,7 @@ io.on('connection', (socket) => {
     if (status === 'ready') order.readyAt = new Date().toISOString();
 
     if (status === 'completed' || status === 'uncollected') {
-      activeTokenCount = Math.max(0, activeTokenCount - 1); // ✅ FIX
+      activeTokenCount = Math.max(0, activeTokenCount - 1);
     }
 
     writeDB(db);
@@ -280,7 +281,7 @@ io.on('connection', (socket) => {
     io.emit('orders:all', db.orders);
   });
 
-  // 📦 STOCK UPDATE
+  // STOCK UPDATE
   socket.on('admin:updateStock', ({ itemId, newStock }) => {
     const db = readDB();
     const item = db.items.find(i => i.id === String(itemId));
@@ -297,7 +298,7 @@ io.on('connection', (socket) => {
   });
 });
 
-// 🚀 START SERVER
+// START SERVER
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
