@@ -1,4 +1,4 @@
-// server.js — ByteBite Full Backend: Express + Socket.IO + JSON DB
+// server.js — ByteBite Backend (Corrected & Stable)
 
 const express = require('express');
 const http = require('http');
@@ -11,36 +11,54 @@ require('dotenv').config();
 const app = express();
 const server = http.createServer(app);
 
-// ✅ CORS FIX (IMPORTANT)
+// ✅ Better CORS (important for Vercel frontend)
+const FRONTEND_URL = process.env.FRONTEND_URL || "*";
+
 const io = new Server(server, {
   cors: {
-    origin: "*",
-    methods: ['GET', 'POST', 'PATCH', 'DELETE']
+    origin: FRONTEND_URL,
+    methods: ['GET', 'POST', 'PATCH', 'DELETE'],
+    credentials: true
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: FRONTEND_URL,
+  credentials: true
+}));
+
 app.use(express.json());
 
 const DB_PATH = path.join(__dirname, 'db.json');
 
-// 📁 DB Helpers
+// 📁 DB Helpers (SAFE VERSION)
 function readDB() {
-  return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  try {
+    return JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  } catch (err) {
+    console.error("DB Read Error:", err);
+    return { students: [], orders: [], items: [], complaints: [], admin: {}, tokenCounter: 0 };
+  }
 }
+
 function writeDB(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  try {
+    fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error("DB Write Error:", err);
+  }
 }
 
 // 🔥 Crowd logic
 let activeTokenCount = 0;
+
 function calcHeat(n) {
   if (n <= 10) return { level: 'green', label: 'Low Crowd' };
   if (n <= 25) return { level: 'yellow', label: 'Moderate' };
   return { level: 'red', label: 'High Crowd' };
 }
 
-// ⏱ Auto mark uncollected
+// ⏱ Auto mark uncollected (FIXED COUNT BUG)
 setInterval(() => {
   const db = readDB();
   const now = Date.now();
@@ -49,9 +67,11 @@ setInterval(() => {
   db.orders.forEach(o => {
     if (o.status === 'ready') {
       const readyTime = new Date(o.readyAt || o.createdAt).getTime();
+
       if (now - readyTime > 30 * 60 * 1000) {
         o.status = 'uncollected';
         o.uncollectedAt = new Date().toISOString();
+        activeTokenCount = Math.max(0, activeTokenCount - 1); // ✅ FIX
         changed = true;
       }
     }
@@ -60,7 +80,6 @@ setInterval(() => {
   if (changed) {
     writeDB(db);
     io.emit('orders:all', db.orders);
-    console.log('[Auto] Uncollected orders updated');
   }
 }, 60000);
 
@@ -73,11 +92,15 @@ app.post('/api/auth/login', (req, res) => {
   const { username, password, role } = req.body;
   const db = readDB();
 
+  if (!username || !password || !role) {
+    return res.status(400).json({ message: 'Missing fields' });
+  }
+
   if (role === 'admin') {
     if (username === db.admin.username && password === db.admin.password) {
       return res.json({ success: true, user: { role: 'admin', username } });
     }
-    return res.status(401).json({ success: false });
+    return res.status(401).json({ success: false, message: 'Invalid admin credentials' });
   }
 
   const student = db.students.find(
@@ -89,7 +112,7 @@ app.post('/api/auth/login', (req, res) => {
     return res.json({ success: true, user: { role: 'student', ...safe } });
   }
 
-  return res.status(401).json({ success: false });
+  return res.status(401).json({ success: false, message: 'Invalid credentials' });
 });
 
 // MENU
@@ -130,6 +153,7 @@ app.post('/api/students', (req, res) => {
   res.status(201).json(safe);
 });
 
+// WALLET UPDATE
 app.patch('/api/students/:id/wallet', (req, res) => {
   const db = readDB();
   const student = db.students.find(s => s.id === req.params.id);
@@ -138,6 +162,8 @@ app.patch('/api/students/:id/wallet', (req, res) => {
 
   student.wallet += Number(req.body.amount);
   writeDB(db);
+
+  io.emit('wallet:update', { wallet: student.wallet }); // ✅ important
 
   res.json({ wallet: student.wallet });
 });
@@ -172,7 +198,7 @@ app.get('/', (req, res) => {
 // ════════════════════════════════
 
 io.on('connection', (socket) => {
-  console.log(`Connected: ${socket.id}`);
+  console.log(`✅ Connected: ${socket.id}`);
 
   socket.emit('heatmap:update', {
     count: activeTokenCount,
@@ -184,12 +210,17 @@ io.on('connection', (socket) => {
     const db = readDB();
     const { studentName, studentId, items, total, paymentMethod } = orderData;
 
+    if (!items || items.length === 0) {
+      return socket.emit('error:order', { message: 'Empty order' });
+    }
+
     if (paymentMethod === 'wallet') {
       const student = db.students.find(s => s.id === studentId);
+
       if (!student || student.wallet < total) {
-        socket.emit('error:order', { message: 'Insufficient balance' });
-        return;
+        return socket.emit('error:order', { message: 'Insufficient balance' });
       }
+
       student.wallet -= total;
       db.admin.totalRevenue += total;
     }
@@ -199,7 +230,7 @@ io.on('connection', (socket) => {
 
     items.forEach(({ itemId, quantity }) => {
       const item = db.items.find(i => i.id === String(itemId));
-      if (item) item.stock -= quantity;
+      if (item) item.stock = Math.max(0, item.stock - quantity); // ✅ safe
     });
 
     const newOrder = {
@@ -216,6 +247,7 @@ io.on('connection', (socket) => {
 
     db.orders.unshift(newOrder);
     writeDB(db);
+
     activeTokenCount++;
 
     io.emit('order:new', newOrder);
@@ -228,23 +260,24 @@ io.on('connection', (socket) => {
     socket.emit('order:confirmed', newOrder);
   });
 
-  // 🔄 UPDATE ORDER STATUS
+  // 🔄 UPDATE STATUS
   socket.on('admin:updateStatus', ({ orderId, status }) => {
     const db = readDB();
     const order = db.orders.find(o => o._id === orderId);
     if (!order) return;
 
     order.status = status;
+
     if (status === 'ready') order.readyAt = new Date().toISOString();
+
+    if (status === 'completed' || status === 'uncollected') {
+      activeTokenCount = Math.max(0, activeTokenCount - 1); // ✅ FIX
+    }
 
     writeDB(db);
 
     io.emit('order:statusUpdate', order);
     io.emit('orders:all', db.orders);
-
-    if (status === 'completed') {
-      activeTokenCount--;
-    }
   });
 
   // 📦 STOCK UPDATE
@@ -259,9 +292,8 @@ io.on('connection', (socket) => {
     io.emit('inventory:update', db.items);
   });
 
-  // 🔌 DISCONNECT
   socket.on('disconnect', () => {
-    console.log(`Disconnected: ${socket.id}`);
+    console.log(`❌ Disconnected: ${socket.id}`);
   });
 });
 
@@ -269,5 +301,5 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 5000;
 
 server.listen(PORT, () => {
-  console.log(`ByteBite backend running on port ${PORT}`);
+  console.log(`🚀 ByteBite backend running on port ${PORT}`);
 });
